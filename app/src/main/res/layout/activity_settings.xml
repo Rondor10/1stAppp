@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Settings">
+
+ <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical"
+     android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textSize="50dp"
+        android:layout_marginBottom="30dp" />
+
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginBottom="35dp"
+       android:text="move to the map"
+       android:id="@+id/btn_tomap" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+
+        android:text="Select the distance:"/>
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="55dp"
+        android:max="19"
+        android:min="0"
+        android:progress="1"/>
+
+    <TextView
+        android:id="@+id/txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SCROLL IT AND WATCH MY PROGRESS"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:layout_marginBottom="55dp"
+        android:textSize="15dp"
+        android:text="Select your attractions(you can choose more than 1 option):" />
+
+    <CheckBox android:id="@+id/checkbox_gym"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GYM" />
+    <CheckBox android:id="@+id/checkbox_movie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Movie" />
+    <CheckBox android:id="@+id/checkbox_football"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Football" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:layout_marginBottom="45dp"
+        android:id="@+id/btn_save"
+        android:text="save" />
+
+ </LinearLayout>
+</ScrollView>
