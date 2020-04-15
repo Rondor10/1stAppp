@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Better4us</string>
+    <string name="Settings">הגדרות</string>
+    <string name="firstName">שם פרטי:</string>
+    <string name="hintFirstName">כתוב את שמך הפרטי</string>
+    <string name="lastName">שם משפחה:</string>
+    <string name="hintLastName">כתוב את שם משפחתך</string>
+    <string name="gender">בחר את מגדרך:</string>
+    <string name="male">זכר</string>
+    <string name="female">נקבה</string>
+    <string name="other">אחר</string>
+    <string name="hintBirthday">בחר את יום הולדתך</string>
+    <string name="birthday">יום הולדתך הוא:</string>
+    <string name="letsStart">בוא נתחיל!</string>
+    <string name="updateMap">עדכן מפה</string>
+    <string name="moveToSettings">עבור להגדרות</string>
+    <string name="followUs">עקוב אחרינו ב:</string>
+    <string name="lookingForGender">מחפש:</string>
+    <string name="noPreferences">ללא העדפות</string>
+    <string name="ageRange">בחר טווח גילאים:</string>
+    <string name="from">החל מ-</string>
+    <string name="to">עד</string>
+    <string name="distance">בחר מרחק (ק"מ):</string>
+    <string name="hobbies">בחר את תחביבייך:</string>
+    <string name="moveToMap">היכון? הכן? צא!</string>
+</resources>

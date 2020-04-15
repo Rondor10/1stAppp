@@ -1,117 +1,181 @@
 package com.example.a1stapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import java.util.LinkedList;
+import com.google.firebase.database.ValueEventListener;
+import java.util.Map;
 
 public class Settings extends AppCompatActivity {
 
     private final int LOCATION_PERMISSION_REQUEST_CODE = 123;
-    CheckBox gym, movie, football;
-    Button btn_tomap, btn_save;
-    double distance, longitude, latitude;
-    TextView txt;
-    SeekBar seekBar;
-    FirebaseDatabase database;
-    DatabaseReference mDatabaseRef;
-    LinkedList categories;
-    String Uid;
-    private FirebaseUser user_Fb;
-
+    private int minAge, maxAge;
+    private MultiSelectSpinner mSpinner;
+    private String firstName = "", lastName = "", wantedGender = "";
+    private EditText minAge_editText, maxAge_editText;
+    private Button btn_save;
+    private TextView txt, textview, titleMsg;
+    private RadioGroup radioGroup_wantedGender;
+    private ImageButton facebook_btn, instagram_btn;
+    private SeekBar seekBar;
+    private User host = new User();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        host.setKey(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        host.setTel(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
+        usersReferences();
         findViews();
-        initViews();
-
-        user_Fb = FirebaseAuth.getInstance().getCurrentUser();
-        Uid = user_Fb.getUid();
-        categories = new LinkedList<String>();
-        database = FirebaseDatabase.getInstance();
-        mDatabaseRef = database.getReference();
-
         if (ActivityCompat.checkSelfPermission(Settings.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(Settings.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(Settings.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
         else {
             // Write you code here if permission already given.
         }
+        updateLocation(); //Keeping location - even if button isn't clicked.
+        initViews();
     }
 
     private void save() {
-        categories.clear();
-        final StringBuilder result = new StringBuilder();
-        result.append("Selected Items:");
+        host.getCategories().clear();
+        String selectedCategories = mSpinner.getSelectedItemsAsString();
+        insertData(selectedCategories);
+        String check = "";
+        if(radioGroup_wantedGender.getCheckedRadioButtonId() == -1) { //Check if wanted partner's gender is selected.
+            check += "You must select your desirable partner's gender. ";
+        }
 
-        if (gym.isChecked()) {
-            result.append("\nGYM");
-            categories.add("GYM");
+        try {
+            minAge = Integer.parseInt(minAge_editText.getText().toString());
+        } catch(NumberFormatException nfe) {
+            check += "You must choose the minimal age you're looking for. ";
         }
-        if (movie.isChecked()) {
-            result.append("\nMovie");
-            categories.add("Movie");
+        try {
+            maxAge = Integer.parseInt(maxAge_editText.getText().toString());
+        } catch(NumberFormatException nfe) {
+            check += "You must choose the maximum age you're looking for. ";
         }
-        if (football.isChecked()) {
-            result.append("\nFootball");
-            categories.add("Football");
-        }
-        result.append("\nDistance: " + distance);
+        if(minAge > maxAge)
+            check += "You cannot enter a minimal age bigger than the maximum age. ";
 
-        if(!(distance == 0) && !(categories.isEmpty()))
-        {
-            result.append("\nSaved successfully.");
-            Toast.makeText(getApplicationContext(), result.toString(), Toast.LENGTH_LONG).show();
-            updateData();
+        if(minAge < 18 || maxAge < 18)
+            check += "People who are below 18 years old can't use this app. ";
+
+        if(host.getDistance() == 0) { //Check if distance is selected.
+            check += "You must choose a distance. ";
         }
-        else if(distance == 0 && categories.isEmpty())
-        {
-            Toast.makeText(getApplicationContext(), "You must choose at least one category. Also, You must choose distance.", Toast.LENGTH_LONG).show();
+
+        int i = 0;
+        for (Map.Entry<String, Boolean> entry : host.getCategories().entrySet()) {
+            if(entry.getValue()) {
+                i++;
+            }
         }
-        else if(categories.isEmpty())
-        {
-            Toast.makeText(getApplicationContext(), "You must choose at least one category.", Toast.LENGTH_LONG).show();
+        if(i == 0) { //Check if hobbies selected.
+            check += "You must choose at least a single hobby.";
         }
-        else if(distance == 0)
-        {
-            Toast.makeText(getApplicationContext(), "You must choose distance.", Toast.LENGTH_LONG).show();
+        if(!check.isEmpty()) {
+            Toast.makeText(getApplicationContext(), check, Toast.LENGTH_LONG).show();
+        }
+        else {
+            host.setGenderWanted(wantedGender);
+            host.setMinAge(minAge);
+            host.setMaxAge(maxAge);
+            FirebaseDatabase.getInstance().getReference().child("users").child(host.getKey()).setValue(host);
+            Intent intent = new Intent(this, HomePage.class);
+            startActivity(intent);
         }
     }
 
-    private void setDistance(double value) {
-        txt.setText("km: " + value);
-        distance = value;
+    private void usersReferences() {
+        FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        int cntUsers = dataSnapshot.child("usersCNT").getValue(int.class);
+                        textview.setText("Welcome to our community of " + cntUsers + " people!");
+                        User temp = dataSnapshot.child("users").child(host.getKey()).getValue(User.class);
+                        if (temp != null && temp.getKey().equals(host.getKey())) {
+                            host = dataSnapshot.child("users").child(host.getKey()).getValue(User.class);
+                            host.setDistance(0);
+                            firstName = host.getFirstName();
+                            lastName = host.getLastName();
+                            titleMsg.setText("Hi " + firstName +  " " + lastName + ", Let's move!");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
     }
 
-    private void goToHomePage() {
-        Intent intent = new Intent(Settings.this, HomePage.class);
-        startActivity(intent);
+    private void updateLocation() {
+        //Updating Location
+        Location loc1 = getLocation(Settings.this);
+        if (loc1 != null) {
+            double latitude = loc1.getLatitude();
+            double longitude = loc1.getLongitude();
+            host.setLatitude(latitude);
+            host.setLongitude(longitude);
+        }
+    }
+
+    private Location getLocation(Context context) {
+        // Check location available permissions - if missing return (exit)
+        boolean isPermission1Available = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean isPermission2Available = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if (!isPermission1Available || !isPermission2Available) {
+            return null;  // exit from function
+        }
+        // get last known location
+        final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+
+        return location;
+    }
+
+    private void insertData(String str) {
+        host.getCategories().put(CATEGORY.FOOTBALL.name(), str.contains("FOOTBALL"));
+        host.getCategories().put(CATEGORY.GYM.name(), str.contains("GYM"));
+        host.getCategories().put(CATEGORY.MOVIE.name(), str.contains("MOVIE"));
+        host.getCategories().put(CATEGORY.SWIMMING.name(), str.contains("SWIMMING"));
+        host.getCategories().put(CATEGORY.SHOPPING.name(), str.contains("SHOPPING"));
+        host.getCategories().put(CATEGORY.BASKETBALL.name(), str.contains("BASKETBALL"));
+        host.getCategories().put(CATEGORY.SNOOKER.name(), str.contains("SNOOKER"));
+        host.getCategories().put(CATEGORY.CONCERT.name(), str.contains("CONCERT"));
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             // The user return to app after location request
-
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -125,66 +189,97 @@ public class Settings extends AppCompatActivity {
         }
     }
 
-    private void updateData() {
-        ////Updating distance
-        mDatabaseRef.child("users").child(Uid).child("distance").setValue(distance);
-        //Updating Location
-        Location loc1 = getLocation(Settings.this);
-        if (loc1 != null) {
-
-            //Updating Longitude
-            longitude = loc1.getLongitude();
-            mDatabaseRef.child("users").child(Uid).child("longitude").setValue(longitude);
-
-            //Updating Latitude
-            latitude = loc1.getLatitude();
-            mDatabaseRef.child("users").child(Uid).child("latitude").setValue(latitude);
+    public void onSelectWantedGender(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.wantedMale:
+                if (checked) {
+                    wantedGender = "Male";
+                    break;
+                }
+            case R.id.wantedFemale:
+                if (checked) {
+                    wantedGender = "Female";
+                    break;
+                }
+            case R.id.wantedOther:
+                if (checked) {
+                    wantedGender = "Other";
+                    break;
+                }
+            case R.id.wantedFlexible:
+                if (checked) {
+                    wantedGender = "Flexible";
+                    break;
+                }
         }
-
-        //Updating categories
-        mDatabaseRef.child("users").child(user_Fb.getUid()).child("categories").setValue(categories);
-    }
-
-    public Location getLocation(Context context) {
-        // Check location available permissions - if missing return (exit)
-        boolean isPermission1Available = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        boolean isPermission2Available = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        if (!isPermission1Available || !isPermission2Available) {
-            return null;  // exit from function
-        }
-
-        // get last known location
-        final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-
-        return location;
     }
 
     private void findViews() {
-        btn_tomap = findViewById(R.id.btn_tomap);
+
+        facebook_btn = findViewById(R.id.facebook_btn);
+        instagram_btn = findViewById(R.id.instagram_btn);
+        titleMsg = findViewById(R.id.titleMsg);
         seekBar = findViewById(R.id.seekBar);
-        gym = findViewById(R.id.checkbox_gym);
-        movie = findViewById(R.id.checkbox_movie);
-        football = findViewById(R.id.checkbox_football);
+        mSpinner = findViewById(R.id.mSpinner);
+        minAge_editText = findViewById(R.id.minAge_editText);
+        maxAge_editText = findViewById(R.id.maxAge_editText);
         btn_save = findViewById(R.id.btn_save);
         txt = findViewById(R.id.txt);
+        textview = findViewById(R.id.textview);
+        radioGroup_wantedGender = findViewById(R.id.radioGroup_wantedGender);
     }
 
     private void initViews() {
-        ////////Moving to the map(HomePage.class)
-        btn_tomap.setOnClickListener(new View.OnClickListener() {
+        ///Open Facebook
+        facebook_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToHomePage();
+                String pageId = "";
+                String pageUrl = "https://www.facebook.com/" + pageId;
+                try {
+                    ApplicationInfo applicationInfo = getPackageManager().getApplicationInfo("com.facebook.katana", 0);
+                    if (applicationInfo.enabled) {
+                        int versionCode = getPackageManager().getPackageInfo("com.facebook.katana", 0).versionCode;
+                        String url;
+                        if (versionCode >= 3002850) {
+                            url = "fb://facewebmodal/f?href=" + pageUrl;
+                        } else {
+                            url = "fb://page/" + pageId;
+                        }
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    } else {
+                        throw new Exception("Facebook is disabled");
+                    }
+                } catch (Exception e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(pageUrl)));
+                }
             }
         });
-
+        ///Open Instagram
+        instagram_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("http://instagram.com/_u/ron_dor10");
+                Intent likeIng = new Intent(Intent.ACTION_VIEW, uri);
+                likeIng.setPackage("com.instagram.android");
+                try {
+                    startActivity(likeIng);
+                } catch (ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://instagram.com/_u/ron_dor10")));
+                }
+            }
+        });
         ///////Seek Bar
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double value = 0.5 * (progress + 1);
-                setDistance(value);
+                txt.setText(value + " km");
+                host.setDistance(value);
             }
 
             @Override
@@ -197,8 +292,12 @@ public class Settings extends AppCompatActivity {
 
             }
         });
-
-        //Applying the Listener on the Button click
+        ////Spinner
+        final String[] select_Categories = {
+                "Select your favorite hobbies", "FOOTBALL", "GYM", "MOVIE", "SWIMMING",
+                "SHOPPING", "BASKETBALL", "SNOOKER", "CONCERT"};
+        mSpinner.setItems(select_Categories);
+        //Applying the Listener on the Button click & get username,gender if not exist
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -207,5 +306,6 @@ public class Settings extends AppCompatActivity {
         });
     }
 }
+
 
 
