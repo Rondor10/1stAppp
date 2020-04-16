@@ -5,6 +5,8 @@ import java.util.HashMap;
 public class User {
 
     private String key = "";
+    private String imageURL = "default";
+    private String fullName = "";
     private String birthday = "";
     private String firstName = "";
     private String lastName = "";
@@ -30,6 +32,22 @@ public class User {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getBirthday() {

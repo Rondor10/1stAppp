@@ -39,7 +39,7 @@ public class Settings extends AppCompatActivity {
     private Button btn_save;
     private TextView txt, textview, titleMsg;
     private RadioGroup radioGroup_wantedGender;
-    private ImageButton facebook_btn, instagram_btn;
+    private ImageButton facebook_btn, instagram_btn, goToChat_btn;
     private SeekBar seekBar;
     private User host = new User();
     @Override
@@ -230,6 +230,7 @@ public class Settings extends AppCompatActivity {
         txt = findViewById(R.id.txt);
         textview = findViewById(R.id.textview);
         radioGroup_wantedGender = findViewById(R.id.radioGroup_wantedGender);
+        goToChat_btn = findViewById(R.id.goToChat_btn);
     }
 
     private void initViews() {
@@ -304,7 +305,16 @@ public class Settings extends AppCompatActivity {
                 save();
             }
         });
+
+        goToChat_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.this, ChatActivity.class);
+                startActivity(intent);
+            }
+        });
     }
+
 }
 
 

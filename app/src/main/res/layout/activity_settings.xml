@@ -42,6 +42,13 @@
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/instagram" />
 
+                <ImageButton
+                    android:id="@+id/goToChat_btn"
+                    android:layout_width="31dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="150dp"
+                    android:background="@drawable/message" />
+
             </LinearLayout>
 
 
@@ -49,6 +56,7 @@
                 android:id="@+id/textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="ttt"
                 android:layout_marginTop="16dp"
                 android:textSize="13dp" />
 
@@ -57,6 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:text="ttttt"
                 android:gravity="center"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20dp"
@@ -164,7 +173,7 @@
                     android:id="@+id/txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="120dp"
+                    android:layout_marginLeft="60dp"
                     android:textSize="14dp" />
 
             </LinearLayout>

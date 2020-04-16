@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background=" #b3ff99"
     android:padding="6dp">
 
     <TextView
@@ -12,6 +12,7 @@
         android:id="@+id/title"
         android:layout_gravity="center"
         android:ellipsize="end"
+        android:background="@drawable/back"
         android:text="TEXT"
         android:maxLines="1"
         android:textColor="#257EC5"
@@ -31,6 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#257EC5"
+        android:textStyle="bold"
         android:layout_gravity="center"
         android:layout_marginTop="4dp"
         android:text="Click this window to start a chat."/>

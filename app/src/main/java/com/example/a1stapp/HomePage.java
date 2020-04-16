@@ -15,20 +15,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
@@ -38,7 +34,8 @@ import guy4444.smartrate.SmartRate;
 
 public class HomePage extends AppCompatActivity {
     private LinkedList<String> sharedHobbies = new LinkedList<>();
-    private Button btn, btn_toSet, reset;
+    private Button btn, btn_toSet;
+    private String hobbies;
     private GoogleMap mMap;
     FloatingActionButton fab;
     private TextView foundUsersCount;
@@ -156,7 +153,7 @@ public class HomePage extends AppCompatActivity {
                         Log.d("OFER", host.getGenderWanted() + " " + guest.getGender());
                         if (flag1 && flag2 && (flag3 || flag4) && flag5) {
                             cnt[0] = cnt[0] + 1;
-                            String hobbies = sharedHobbies.toString();
+                            hobbies = sharedHobbies.toString();
                             hobbies = hobbies.replace("[", "");
                             hobbies = hobbies.replace("]", "");
                             hobbies = hobbies.toLowerCase();
@@ -189,11 +186,10 @@ public class HomePage extends AppCompatActivity {
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                String contact = guest.getTel(); // use country code with your phone number
-                sendWaMsg(contact);
+                Intent intent = new Intent(HomePage.this, ChatActivity.class);
+                startActivity(intent);
             }
         });
-        reset.setVisibility(View.VISIBLE);
         btn.setVisibility(View.GONE);
     }
 
@@ -253,7 +249,6 @@ public class HomePage extends AppCompatActivity {
     private void findViews() {
         btn_toSet = findViewById(R.id.btn_toset);
         btn = findViewById(R.id.btn_mapControl);
-        reset = findViewById(R.id.reset);
         foundUsersCount = findViewById(R.id.foundUsersCount);
         fab = findViewById(R.id.fab);
     }
@@ -272,16 +267,6 @@ public class HomePage extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), Settings.class);
                 startActivity(intent);
-            }
-        });
-        //Reset MAP
-        reset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMap.clear();
-                host.getCategories().clear();
-                host.setDistance(0);
-                FirebaseDatabase.getInstance().getReference().child("users").child(host.getKey()).setValue(host);
             }
         });
         //Floating action bar - rate app button.
@@ -305,24 +290,6 @@ public class HomePage extends AppCompatActivity {
                 , Color.parseColor("#257EC5")
                 , 1
         );
-    }
-
-    private void sendWaMsg(String phoneNumber) {
-        String url = "https://api.whatsapp.com/send?phone=" + phoneNumber;
-        try {
-            PackageManager pm = getApplicationContext().getPackageManager();
-            pm.getPackageInfo("com.whatsapp", PackageManager.GET_ACTIVITIES);
-            Intent waIntent = new Intent(Intent.ACTION_VIEW);
-            waIntent.setData(Uri.parse(url));
-//            waIntent.setType("text/plain");
-//            String waMsg = "Hi " + guest.getFirstName() + " " + guest.getLastName() + ", I'm " + host.getFirstName() + " " + host.getLastName() + ". Our shared hobbies are: " + sharedHobbies.toString();
-//            waIntent.putExtra(Intent.EXTRA_TEXT, waMsg);
-//            startActivity(Intent.createChooser(waIntent, "Share with"));
-            startActivity(waIntent);
-        } catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(getApplicationContext(), "Unfortunately, we couldn't complete the process, as the Whatsapp app isn't installed in your phone.", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
     }
 
     public int getAge(int _year, int _month, int _day) {

@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:text="Let's find some partners for you!"
             android:layout_marginBottom="10dp"
             android:textColor="#257EC5"
             android:textSize="20dp"
@@ -26,42 +27,31 @@
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="233dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             tools:context=".MapsActivity" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="7dp"
-            android:layout_marginBottom="10dp">
+            android:animateLayoutChanges="true"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <Button
-                android:layout_marginLeft="10dp"
                 android:id="@+id/btn_mapControl"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/button"
                 android:text="UPDATE MAP"
                 android:textColor="@color/white" />
 
             <Button
-                android:layout_marginLeft="10dp"
-                android:id="@+id/reset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/button"
-                android:text="RESET YOUR FILTERS"
-                android:textColor="@color/white"
-                android:visibility="gone" />
-
-            <Button
                 android:id="@+id/btn_toset"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_height="34dp"
                 android:background="@drawable/button"
                 android:text="@string/moveToSettings"
                 android:textColor="@color/white" />
@@ -74,11 +64,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/fab_margin"
-            android:layout_marginTop="@dimen/fab_margin"
             android:layout_marginEnd="@dimen/fab_margin"
             android:layout_marginBottom="@dimen/fab_margin"
             app:srcCompat="@android:drawable/star_off" />
 
     </LinearLayout>
-
 </RelativeLayout>

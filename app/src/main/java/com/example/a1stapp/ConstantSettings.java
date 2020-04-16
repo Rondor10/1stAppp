@@ -94,6 +94,7 @@ public class ConstantSettings extends AppCompatActivity {
         if(check.isEmpty()) {
             host.setFirstName(firstName);
             host.setLastName(lastName);
+            host.setFullName((firstName + " " + lastName).toLowerCase());
             host.setGender(gender);
             host.setBirthday(userDOBView.getText().toString());
             FirebaseDatabase.getInstance().getReference().child("users").child(host.getKey()).setValue(host);

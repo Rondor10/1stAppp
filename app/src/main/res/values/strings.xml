@@ -2,26 +2,27 @@
     <string name="title_activity_splash" translatable="false">Activity_Splash</string>
     <string name="app_name" translatable="false">Better4us</string>
     <string name="Settings">Settings</string>
-    <string name="firstName">First name:</string>
-    <string name="hintFirstName">Enter your first name</string>
-    <string name="lastName">Last name:</string>
-    <string name="hintLastName">Enter your last name</string>
-    <string name="gender">Select your gender:</string>
+    <string name="firstName">First Name:</string>
+    <string name="hintFirstName">Enter Your First Name</string>
+    <string name="lastName">Last Name:</string>
+    <string name="hintLastName">Enter Your Last Name</string>
+    <string name="gender">Select Your Gender:</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="other">Other</string>
-    <string name="birthday">Your birth date is:</string>
-    <string name="hintBirthday">Select your birthday</string>
+    <string name="birthday">Your Birth Date is:</string>
+    <string name="hintBirthday">Select Your Birthday</string>
     <string name="letsStart">"Let's Start!"</string>
     <string name="updateMap">UPDATE MAP</string>
     <string name="moveToSettings">Move To Settings</string>
-    <string name="followUs">Follow us on: </string>
-    <string name="lookingForGender">Looking for a:</string>
-    <string name="noPreferences">No preferences</string>
-    <string name="ageRange">Choose the age range:</string>
+    <string name="followUs">Follow Us On: </string>
+    <string name="lookingForGender">Looking For A:</string>
+    <string name="noPreferences">No Preferences</string>
+    <string name="ageRange">Choose An Age Range:</string>
     <string name="from">From</string>
     <string name="to">To</string>
-    <string name="distance">Select the distance (km):</string>
-    <string name="hobbies">Select your hoobies: </string>
+    <string name="distance">Select Your Maximum Distance (km):</string>
+    <string name="hobbies">Select Your Hobbies: </string>
     <string name="moveToMap">READY? SET? GO!</string>
+
 </resources>

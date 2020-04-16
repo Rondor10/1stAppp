@@ -71,7 +71,9 @@ public class Activity_Splash extends AppCompatActivity {
         final ArrayList<User> users = new ArrayList<User>();
         User u1 = new User();
         u1.setKey("asdadsdasdasdasda");
+        u1.setImageURL("default");
         u1.setBirthday("03/15/2002");
+        u1.setFullName("ron dor");
         u1.setMinAge(19);
         u1.setMaxAge(23);
         u1.setFirstName("Ron");
@@ -95,6 +97,8 @@ public class Activity_Splash extends AppCompatActivity {
         User u2 = new User();
         u2.setKey("erg3gregwerw33tgf");
         u2.setBirthday("05/27/1997");
+        u2.setImageURL("default");
+        u2.setFullName("din dor");
         u2.setMinAge(18);
         u2.setMaxAge(27);
         u2.setFirstName("Din");
@@ -118,6 +122,8 @@ public class Activity_Splash extends AppCompatActivity {
         User u3 = new User();
         u3.setKey("sfdvsvsv4t43t4");
         u3.setBirthday("06/30/1972");
+        u3.setImageURL("default");
+        u3.setFullName("david dor");
         u3.setMinAge(47);
         u3.setMaxAge(52);
         u3.setFirstName("David");
@@ -141,6 +147,8 @@ public class Activity_Splash extends AppCompatActivity {
         User u4 = new User();
         u4.setKey("34t243gf32f34fsdfs");
         u4.setBirthday("09/10/1973");
+        u4.setFullName("revital dor");
+        u4.setImageURL("default");
         u4.setMinAge(46);
         u4.setMaxAge(53);
         u4.setFirstName("Revital");
@@ -164,9 +172,11 @@ public class Activity_Splash extends AppCompatActivity {
         User u5 = new User();
         u5.setKey("dfsdgdswerg3543t34");
         u5.setBirthday("05/24/2001");
+        u5.setImageURL("default");
+        u5.setFullName("idan dor");
         u5.setMinAge(18);
         u5.setMaxAge(29);
-        u5.setFirstName("Yaniv");
+        u5.setFirstName("Idan");
         u5.setLastName("Dor");
         u5.setGender("Male");
         u5.setGenderWanted("Other");
