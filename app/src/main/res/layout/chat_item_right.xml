@@ -26,6 +26,14 @@
             android:textColor="#fff"
             android:text="hello"/>
 
+        <TextView
+            android:id="@+id/text_seen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seen"
+            android:layout_below="@id/show_message"
+            android:layout_alignParentRight="true"/>
+
     </RelativeLayout>
 
 </RelativeLayout>

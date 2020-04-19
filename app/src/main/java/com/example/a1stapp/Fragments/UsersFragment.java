@@ -1,4 +1,4 @@
-package com.example.a1stapp;
+package com.example.a1stapp.Fragments;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -11,6 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import com.example.a1stapp.R;
+import com.example.a1stapp.Models.User;
+import com.example.a1stapp.Adapters.UserAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +25,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,8 +82,7 @@ public class UsersFragment extends Fragment {
                         mUsers.add(user);
                     }
                 }
-
-                userAdapter = new UserAdapter(getContext(), mUsers, false);
+                userAdapter = new UserAdapter(getContext(), mUsers, false, true);
                 recyclerView.setAdapter(userAdapter);
             }
 
@@ -106,7 +108,7 @@ public class UsersFragment extends Fragment {
                             mUsers.add(user);
                         }
                     }
-                    userAdapter = new UserAdapter(getContext(), mUsers);
+                    userAdapter = new UserAdapter(getContext(), mUsers, false, true);
                     recyclerView.setAdapter(userAdapter);
                 }
             }

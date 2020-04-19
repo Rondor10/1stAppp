@@ -11,6 +11,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import com.example.a1stapp.Models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -204,16 +206,16 @@ public class Activity_Splash extends AppCompatActivity {
         user_Fb = FirebaseAuth.getInstance().getCurrentUser();
         if (user_Fb != null) {
             Log.d("OFER", "user: " + user_Fb.getPhoneNumber());
-            FirebaseDatabase.getInstance().getReference().child("users").child(user_Fb.getUid()).child("firstName").addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference().child("users").child(user_Fb.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String firstName = dataSnapshot.getValue(String.class);
-                    if(firstName.isEmpty()) {
+                    if(dataSnapshot.child("firstName").getValue().equals("")) {
                         Intent intent = new Intent(Activity_Splash.this, ConstantSettings.class);
                         startActivity(intent);
                         finish();
                     }
                     else {
+                        FirebaseDatabase.getInstance().getReference().child("users").child(user_Fb.getUid()).child("online").setValue(true);
                         Intent intent = new Intent(Activity_Splash.this, Settings.class);
                         startActivity(intent);
                         finish();

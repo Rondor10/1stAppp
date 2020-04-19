@@ -1,4 +1,4 @@
-package com.example.a1stapp;
+package com.example.a1stapp.Fragments;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -8,6 +8,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.a1stapp.Models.Chat;
+import com.example.a1stapp.R;
+import com.example.a1stapp.Notifications.Token;
+import com.example.a1stapp.Models.User;
+import com.example.a1stapp.Adapters.UserAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -15,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +34,7 @@ public class ChatsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
+    boolean something;
     private List<User> mUsers;
     private FirebaseUser fuser;
     private DatabaseReference reference;
@@ -66,8 +74,16 @@ public class ChatsFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+        updateToken(FirebaseInstanceId.getInstance().getToken());
         return view;
     }
+
+    private void updateToken(String token){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
+        Token token1 = new Token(token);
+        reference.child(fuser.getUid()).setValue(token1);
+    }
+
     private void readChats() {
         mUsers = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("users");
@@ -77,6 +93,9 @@ public class ChatsFragment extends Fragment {
                 mUsers.clear();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
+                    if(user.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        something = user.isShowOnline();
+                    }
                     //display 1 user from chats
                     for (String id : usersList) {
                         if(user.getKey().equals(id)) {
@@ -93,7 +112,7 @@ public class ChatsFragment extends Fragment {
                         }
                     }
                 }
-                userAdapter = new UserAdapter(getContext(), mUsers);
+                userAdapter = new UserAdapter(getContext(), mUsers, true, something);
                 recyclerView.setAdapter(userAdapter);
             }
             @Override

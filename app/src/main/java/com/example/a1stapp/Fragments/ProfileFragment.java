@@ -1,20 +1,28 @@
-package com.example.a1stapp;
+package com.example.a1stapp.Fragments;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
+import com.example.a1stapp.R;
+import com.example.a1stapp.Models.User;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -31,16 +39,18 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.HashMap;
-
+import java.util.List;
+import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
-
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
 
     private CircleImageView image_profile;
-    private TextView username;
+    private TextView username, loc;
+    User user;
     private DatabaseReference reference;
     private FirebaseUser fuser;
     private StorageReference storageReference;
@@ -54,6 +64,7 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         image_profile = view.findViewById(R.id.profile_image);
+        loc = view.findViewById(R.id.loc);
         username = view.findViewById(R.id.username);
         storageReference = FirebaseStorage.getInstance().getReference().child("uploads");
         fuser = FirebaseAuth.getInstance().getCurrentUser();
@@ -61,9 +72,14 @@ public class ProfileFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+                user = dataSnapshot.getValue(User.class);
+                double latitude = user.getLatitude();
+                double longitude = user.getLongitude();
+                String cityName = getCityName(latitude, longitude);
+                String countryName = getCountryName(latitude, longitude);
+                Log.d("Address", cityName + ", " + countryName);
+                loc.setText(cityName + ", " + countryName);
                 username.setText(user.getFirstName() + " " + user.getLastName());
-
                 if(user.getImageURL().equals("default")) {
                     image_profile.setImageResource(R.mipmap.ic_launcher);
                 } else {
@@ -75,6 +91,53 @@ public class ProfileFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+        Switch sw = view.findViewById(R.id.switch1);
+        boolean value = true; // default value if no value was found
+        final SharedPreferences sharedPreferences = getContext().getSharedPreferences("isSeenChecked", 0);
+        value = sharedPreferences.getBoolean("isSeenChecked", value); // retrieve the value of your key
+        sw.setChecked(value);
+        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sharedPreferences.edit().putBoolean("isSeenChecked", true).apply();
+                    reference = FirebaseDatabase.getInstance().getReference().child("users").child(fuser.getUid());
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("readReceipts", true);
+                    reference.updateChildren(map);
+                } else {
+                    sharedPreferences.edit().putBoolean("isSeenChecked", false).apply();
+                    reference = FirebaseDatabase.getInstance().getReference().child("users").child(fuser.getUid());
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("readReceipts", false);
+                    reference.updateChildren(map);
+                }
+            }
+        });
+
+        Switch showStatus = view.findViewById(R.id.switch2);
+        boolean signature = true;
+        final SharedPreferences sharedPreferences1 = getContext().getSharedPreferences("isOnlineChecked", 0);
+        signature = sharedPreferences1.getBoolean("isOnlineChecked", signature); // retrieve the value of your key
+        showStatus.setChecked(signature);
+        showStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sharedPreferences1.edit().putBoolean("isOnlineChecked", true).apply();
+                    reference = FirebaseDatabase.getInstance().getReference().child("users").child(fuser.getUid());
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("showOnline", true);
+                    reference.updateChildren(map);
+                } else {
+                    sharedPreferences1.edit().putBoolean("isOnlineChecked", false).apply();
+                    reference = FirebaseDatabase.getInstance().getReference().child("users").child(fuser.getUid());
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("showOnline", false);
+                    reference.updateChildren(map);
+                }
+            }
+        });
+
+
 
         image_profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,5 +219,49 @@ public class ProfileFragment extends Fragment {
                 uploadImage();
             }
         }
+    }
+
+    public String getCityName(double latitude, double longitude) {
+        String cityName = "Not Found";
+        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = gcd.getFromLocation(latitude, longitude,
+                    10);
+            for (Address adrs : addresses) {
+                if (adrs != null) {
+                    String city = adrs.getLocality();
+                    if (city != null && !city.equals("")) {
+                        cityName = city;
+                    } else {
+                    }
+                    // // you should also try with addresses.get(0).toSring();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cityName;
+    }
+
+    public String getCountryName(double latitude, double longitude) {
+        String countryName = "Not Found";
+        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = gcd.getFromLocation(latitude, longitude,
+                    10);
+            for (Address adrs : addresses) {
+                if (adrs != null) {
+                    String country_Name = adrs.getCountryName();
+                    if (country_Name != null && !country_Name.equals("")) {
+                        countryName = country_Name;
+                    } else {
+                    }
+                    // // you should also try with addresses.get(0).toSring();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return countryName;
     }
 }

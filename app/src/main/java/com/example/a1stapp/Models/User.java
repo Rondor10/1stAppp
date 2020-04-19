@@ -1,4 +1,4 @@
-package com.example.a1stapp;
+package com.example.a1stapp.Models;
 
 import java.util.HashMap;
 
@@ -6,6 +6,9 @@ public class User {
 
     private String key = "";
     private String imageURL = "default";
+    private boolean readReceipts = true;
+    private boolean isOnline = true;
+    private boolean showOnline = true;
     private String fullName = "";
     private String birthday = "";
     private String firstName = "";
@@ -32,6 +35,30 @@ public class User {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public boolean isReadReceipts() {
+        return readReceipts;
+    }
+
+    public void setReadReceipts(boolean readReceipts) {
+        this.readReceipts = readReceipts;
+    }
+
+    public boolean isShowOnline() {
+        return showOnline;
+    }
+
+    public void setShowOnline(boolean showOnline) {
+        this.showOnline = showOnline;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
     }
 
     public String getImageURL() {

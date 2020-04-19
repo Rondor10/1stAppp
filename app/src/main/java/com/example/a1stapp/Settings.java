@@ -15,29 +15,34 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.a1stapp.Models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class Settings extends AppCompatActivity {
 
     private final int LOCATION_PERMISSION_REQUEST_CODE = 123;
-    private int minAge, maxAge;
     private MultiSelectSpinner mSpinner;
+    int MY_SIGN = 0;
     private String firstName = "", lastName = "", wantedGender = "";
-    private EditText minAge_editText, maxAge_editText;
+    private RangeSeekBar SeekBarRange;
     private Button btn_save;
-    private TextView txt, textview, titleMsg;
+    private TextView txt, textview, titleMsg, min;
     private RadioGroup radioGroup_wantedGender;
     private ImageButton facebook_btn, instagram_btn, goToChat_btn;
     private SeekBar seekBar;
@@ -70,21 +75,8 @@ public class Settings extends AppCompatActivity {
             check += "You must select your desirable partner's gender. ";
         }
 
-        try {
-            minAge = Integer.parseInt(minAge_editText.getText().toString());
-        } catch(NumberFormatException nfe) {
-            check += "You must choose the minimal age you're looking for. ";
-        }
-        try {
-            maxAge = Integer.parseInt(maxAge_editText.getText().toString());
-        } catch(NumberFormatException nfe) {
-            check += "You must choose the maximum age you're looking for. ";
-        }
-        if(minAge > maxAge)
-            check += "You cannot enter a minimal age bigger than the maximum age. ";
-
-        if(minAge < 18 || maxAge < 18)
-            check += "People who are below 18 years old can't use this app. ";
+        if(MY_SIGN == 0)
+            check += "You Must Choose An Age Range. ";
 
         if(host.getDistance() == 0) { //Check if distance is selected.
             check += "You must choose a distance. ";
@@ -104,8 +96,6 @@ public class Settings extends AppCompatActivity {
         }
         else {
             host.setGenderWanted(wantedGender);
-            host.setMinAge(minAge);
-            host.setMaxAge(maxAge);
             FirebaseDatabase.getInstance().getReference().child("users").child(host.getKey()).setValue(host);
             Intent intent = new Intent(this, HomePage.class);
             startActivity(intent);
@@ -224,8 +214,8 @@ public class Settings extends AppCompatActivity {
         titleMsg = findViewById(R.id.titleMsg);
         seekBar = findViewById(R.id.seekBar);
         mSpinner = findViewById(R.id.mSpinner);
-        minAge_editText = findViewById(R.id.minAge_editText);
-        maxAge_editText = findViewById(R.id.maxAge_editText);
+        min = findViewById(R.id.min);
+        SeekBarRange= findViewById(R.id.SeekBarRange);
         btn_save = findViewById(R.id.btn_save);
         txt = findViewById(R.id.txt);
         textview = findViewById(R.id.textview);
@@ -274,6 +264,17 @@ public class Settings extends AppCompatActivity {
                 }
             }
         });
+
+        ///////Range Seek Bar
+        SeekBarRange.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
+            @Override
+            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue) {
+                min.setText(minValue + " - " + + maxValue);
+                host.setMinAge(minValue);
+                host.setMaxAge(maxValue);
+                MY_SIGN = 1;
+            }
+        });
         ///////Seek Bar
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -315,6 +316,23 @@ public class Settings extends AppCompatActivity {
         });
     }
 
+    private void status(boolean status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(host.getKey());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("online", status);
+        reference.updateChildren(hashMap);
+    }
+
+    protected void onResume() {
+        super.onResume();
+        status(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status(false);
+    }
 }
 
 

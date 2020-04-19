@@ -1,5 +1,7 @@
 package com.example.a1stapp;
 
+import com.example.a1stapp.Adapters.MyMarkerAdapter;
+import com.example.a1stapp.Models.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -12,6 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import android.content.Intent;
@@ -27,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -307,6 +311,24 @@ public class HomePage extends AppCompatActivity {
             --a;
         }
         return a;
+    }
+
+    private void status(boolean status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users").child(host.getKey());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("online", status);
+        reference.updateChildren(hashMap);
+    }
+
+    protected void onResume() {
+        super.onResume();
+        status(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status(false);
     }
 }
 
