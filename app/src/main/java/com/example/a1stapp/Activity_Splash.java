@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
 import com.example.a1stapp.Models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -75,11 +73,11 @@ public class Activity_Splash extends AppCompatActivity {
         u1.setKey("asdadsdasdasdasda");
         u1.setImageURL("default");
         u1.setBirthday("03/15/2002");
-        u1.setFullName("ron dor");
+        u1.setFullName("aviv levy");
         u1.setMinAge(19);
         u1.setMaxAge(23);
-        u1.setFirstName("Ron");
-        u1.setLastName("Dor");
+        u1.setFirstName("Aviv");
+        u1.setLastName("Levy");
         u1.setGender("Male");
         u1.setGenderWanted("Flexible");
         u1.setTel("+972557654321");
@@ -100,11 +98,11 @@ public class Activity_Splash extends AppCompatActivity {
         u2.setKey("erg3gregwerw33tgf");
         u2.setBirthday("05/27/1997");
         u2.setImageURL("default");
-        u2.setFullName("din dor");
+        u2.setFullName("lia maman");
         u2.setMinAge(18);
         u2.setMaxAge(27);
-        u2.setFirstName("Din");
-        u2.setLastName("Dor");
+        u2.setFirstName("Lia");
+        u2.setLastName("Maman");
         u2.setGender("Female");
         u2.setGenderWanted("Male");
         u2.setTel("+972551111111");
@@ -125,11 +123,11 @@ public class Activity_Splash extends AppCompatActivity {
         u3.setKey("sfdvsvsv4t43t4");
         u3.setBirthday("06/30/1972");
         u3.setImageURL("default");
-        u3.setFullName("david dor");
+        u3.setFullName("tamir katav");
         u3.setMinAge(47);
         u3.setMaxAge(52);
-        u3.setFirstName("David");
-        u3.setLastName("Dor");
+        u3.setFirstName("Tamir");
+        u3.setLastName("Katav");
         u3.setGender("Male");
         u3.setGenderWanted("Other");
         u3.setTel("+972552222222");
@@ -149,12 +147,12 @@ public class Activity_Splash extends AppCompatActivity {
         User u4 = new User();
         u4.setKey("34t243gf32f34fsdfs");
         u4.setBirthday("09/10/1973");
-        u4.setFullName("revital dor");
+        u4.setFullName("shimon tzadok");
         u4.setImageURL("default");
         u4.setMinAge(46);
         u4.setMaxAge(53);
-        u4.setFirstName("Revital");
-        u4.setLastName("Dor");
+        u4.setFirstName("Shimon");
+        u4.setLastName("Tzadok");
         u4.setGender("Male");
         u4.setGenderWanted("Female");
         u4.setTel("+97255333333");
@@ -175,11 +173,11 @@ public class Activity_Splash extends AppCompatActivity {
         u5.setKey("dfsdgdswerg3543t34");
         u5.setBirthday("05/24/2001");
         u5.setImageURL("default");
-        u5.setFullName("idan dor");
+        u5.setFullName("eran zahavi");
         u5.setMinAge(18);
         u5.setMaxAge(29);
-        u5.setFirstName("Idan");
-        u5.setLastName("Dor");
+        u5.setFirstName("Eran");
+        u5.setLastName("Zahavi");
         u5.setGender("Male");
         u5.setGenderWanted("Other");
         u5.setTel("+97255444444");
@@ -205,11 +203,10 @@ public class Activity_Splash extends AppCompatActivity {
         //Starting process
         user_Fb = FirebaseAuth.getInstance().getCurrentUser();
         if (user_Fb != null) {
-            Log.d("OFER", "user: " + user_Fb.getPhoneNumber());
             FirebaseDatabase.getInstance().getReference().child("users").child(user_Fb.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child("firstName").getValue().equals("")) {
+                    if(dataSnapshot.child("firstName").getValue().toString().equals("")) {
                         Intent intent = new Intent(Activity_Splash.this, ConstantSettings.class);
                         startActivity(intent);
                         finish();
@@ -226,7 +223,6 @@ public class Activity_Splash extends AppCompatActivity {
                 }
             });
         } else {
-            Log.d("OFER", "user: null");
             login();
         }
     }
@@ -244,15 +240,12 @@ public class Activity_Splash extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d("OFER", "requestCode: " + requestCode);
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK)
             {   // Successfully signed in
                 user_Fb = FirebaseAuth.getInstance().getCurrentUser();
                 String phoneNumber = user_Fb.getPhoneNumber();
-                Log.d("OFER", "NEW USER PHONE NUMBER: " + phoneNumber);
-                Log.d("OFER", "NEW USER ID: " + user_Fb.getUid());
                 addNewUser(phoneNumber);
                 relativeLayout.setBackgroundColor(getResources().getColor(R.color.white));
                 splash_IMG_logo.setVisibility(View.GONE);
@@ -288,7 +281,6 @@ public class Activity_Splash extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-        //
         newUser = new User(phoneNumber, user_Fb.getUid());
         mDatabase.child("users").child(user_Fb.getUid()).setValue(newUser);
         try {

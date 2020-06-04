@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
 import com.example.a1stapp.R;
 import com.example.a1stapp.Models.User;
 import com.example.a1stapp.Adapters.UserAdapter;
@@ -26,11 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UsersFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UsersFragment extends Fragment {
 
     private RecyclerView recyclerView;
@@ -67,25 +61,24 @@ public class UsersFragment extends Fragment {
         return view;
     }
 
-    private void searchUsers(String text) {
+    private void searchUsers(String s) {
         final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
-        Query query = FirebaseDatabase.getInstance().getReference().child("users").orderByChild("fullName").startAt(text).endAt(text + "\uf8ff");
+        Query query = FirebaseDatabase.getInstance().getReference("users").orderByChild("fullName").startAt(s).endAt(s + "\uf8ff");
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mUsers.clear();
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     User user = snapshot.getValue(User.class);
                     assert user != null;
                     assert fuser != null;
-                    if(!user.getKey().equals(fuser.getUid())) {
+                    if (!user.getKey().equals(fuser.getUid())){
                         mUsers.add(user);
                     }
                 }
                 userAdapter = new UserAdapter(getContext(), mUsers, false, true);
                 recyclerView.setAdapter(userAdapter);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
@@ -95,7 +88,7 @@ public class UsersFragment extends Fragment {
     private void readUsers() {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (search_users.getText().toString().equals("")) {

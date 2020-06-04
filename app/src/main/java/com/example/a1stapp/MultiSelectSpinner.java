@@ -59,14 +59,8 @@ public class MultiSelectSpinner extends AppCompatSpinner implements DialogInterf
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-
             }
-
         });
-        /*if (mSelection.length > 3){
-            Toast.makeText(getContext(), "Cannot select more than 3", Toast.LENGTH_SHORT).show();
-            return false;
-        }*/
         builder.show();
         return true;
     }
@@ -90,7 +84,6 @@ public class MultiSelectSpinner extends AppCompatSpinner implements DialogInterf
         mSelection = new boolean[_items.length];
         simple_adapter.clear();
         simple_adapter.add("Tap to select");
-        ///simple_adapter.add(_items[0]);
         Arrays.fill(mSelection, false);
     }
 
@@ -131,13 +124,6 @@ public class MultiSelectSpinner extends AppCompatSpinner implements DialogInterf
         }
         simple_adapter.clear();
         simple_adapter.add(buildSelectedItemString());
-        /*if (sbLength>0){
-            Toast.makeText(getContext(), "Length greater than zero", Toast.LENGTH_SHORT).show();
-            simple_adapter.add(buildSelectedItemString());
-        }else{
-            Toast.makeText(getContext(), "Length shorter", Toast.LENGTH_SHORT).show();
-            simple_adapter.add("Tap to select");
-        }*/
     }
 
     public void setSelection(int[] selectedIndicies) {
@@ -191,8 +177,6 @@ public class MultiSelectSpinner extends AppCompatSpinner implements DialogInterf
                 sb.append(_items[i]);
             }
         }
-
-        //Log.e("sb length",""+sb.length());
         sbLength = sb.length();
         return sb.toString();
     }
@@ -210,12 +194,6 @@ public class MultiSelectSpinner extends AppCompatSpinner implements DialogInterf
                 sb.append(_items[i]);
             }
         }
-        /*String sbCheck;
-        if (sb.length()>0){
-           sbCheck=sb.toString();
-        }else{
-            sbCheck="Tap to select";
-        }*/
         return sb.toString();
     }
 }

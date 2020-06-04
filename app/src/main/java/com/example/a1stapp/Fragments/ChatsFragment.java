@@ -8,10 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.a1stapp.Models.Chat;
 import com.example.a1stapp.R;
-import com.example.a1stapp.Notifications.Token;
 import com.example.a1stapp.Models.User;
 import com.example.a1stapp.Adapters.UserAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,25 +19,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChatsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ChatsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
-    boolean something;
+    boolean isUserOnline = false;
     private List<User> mUsers;
     private FirebaseUser fuser;
     private DatabaseReference reference;
     private List<String> usersList;
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,7 +43,7 @@ public class ChatsFragment extends Fragment {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         usersList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("chats");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 usersList.clear();
@@ -74,27 +66,20 @@ public class ChatsFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-        updateToken(FirebaseInstanceId.getInstance().getToken());
         return view;
-    }
-
-    private void updateToken(String token){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
-        Token token1 = new Token(token);
-        reference.child(fuser.getUid()).setValue(token1);
     }
 
     private void readChats() {
         mUsers = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("users");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mUsers.clear();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     if(user.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                        something = user.isShowOnline();
+                        isUserOnline = user.isShowOnline();
                     }
                     //display 1 user from chats
                     for (String id : usersList) {
@@ -112,7 +97,7 @@ public class ChatsFragment extends Fragment {
                         }
                     }
                 }
-                userAdapter = new UserAdapter(getContext(), mUsers, true, something);
+                userAdapter = new UserAdapter(getContext(), mUsers, true, isUserOnline);
                 recyclerView.setAdapter(userAdapter);
             }
             @Override

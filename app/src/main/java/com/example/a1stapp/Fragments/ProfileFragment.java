@@ -4,11 +4,8 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,18 +35,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
 
     private CircleImageView image_profile;
-    private TextView username, loc;
+    private TextView username;
     User user;
     private DatabaseReference reference;
     private FirebaseUser fuser;
@@ -64,21 +57,14 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         image_profile = view.findViewById(R.id.profile_image);
-        loc = view.findViewById(R.id.loc);
         username = view.findViewById(R.id.username);
         storageReference = FirebaseStorage.getInstance().getReference().child("uploads");
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(fuser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
-                double latitude = user.getLatitude();
-                double longitude = user.getLongitude();
-                String cityName = getCityName(latitude, longitude);
-                String countryName = getCountryName(latitude, longitude);
-                Log.d("Address", cityName + ", " + countryName);
-                loc.setText(cityName + ", " + countryName);
                 username.setText(user.getFirstName() + " " + user.getLastName());
                 if(user.getImageURL().equals("default")) {
                     image_profile.setImageResource(R.mipmap.ic_launcher);
@@ -136,9 +122,6 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-
-
-
         image_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,49 +202,5 @@ public class ProfileFragment extends Fragment {
                 uploadImage();
             }
         }
-    }
-
-    public String getCityName(double latitude, double longitude) {
-        String cityName = "Not Found";
-        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
-        try {
-            List<Address> addresses = gcd.getFromLocation(latitude, longitude,
-                    10);
-            for (Address adrs : addresses) {
-                if (adrs != null) {
-                    String city = adrs.getLocality();
-                    if (city != null && !city.equals("")) {
-                        cityName = city;
-                    } else {
-                    }
-                    // // you should also try with addresses.get(0).toSring();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return cityName;
-    }
-
-    public String getCountryName(double latitude, double longitude) {
-        String countryName = "Not Found";
-        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
-        try {
-            List<Address> addresses = gcd.getFromLocation(latitude, longitude,
-                    10);
-            for (Address adrs : addresses) {
-                if (adrs != null) {
-                    String country_Name = adrs.getCountryName();
-                    if (country_Name != null && !country_Name.equals("")) {
-                        countryName = country_Name;
-                    } else {
-                    }
-                    // // you should also try with addresses.get(0).toSring();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return countryName;
     }
 }

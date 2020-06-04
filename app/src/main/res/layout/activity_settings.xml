@@ -20,54 +20,19 @@
             android:gravity="left"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginTop="30dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/followUs" />
-
-                <ImageButton
-                    android:id="@+id/facebook_btn"
-                    android:layout_width="29dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="8.5dp"
-                    android:background="@drawable/facebook" />
-
-                <ImageButton
-                    android:id="@+id/instagram_btn"
-                    android:layout_width="33dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:background="@drawable/instagram" />
-
-                <ImageButton
-                    android:id="@+id/goToChat_btn"
-                    android:layout_width="31dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="150dp"
-                    android:background="@drawable/message" />
-
-            </LinearLayout>
-
-
-            <TextView
-                android:id="@+id/textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ttt"
-                android:layout_marginTop="16dp"
-                android:textSize="13dp" />
+            <ImageButton
+                android:id="@+id/goToChat_btn"
+                android:layout_marginTop="10dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="330dp"
+                android:background="@drawable/message" />
 
             <TextView
                 android:id="@+id/titleMsg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="ttttt"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20dp"

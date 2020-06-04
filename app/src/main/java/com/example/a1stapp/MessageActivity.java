@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.a1stapp.Adapters.MessageAdapter;
-import com.example.a1stapp.Fragments.APIService;
 import com.example.a1stapp.Models.Chat;
 import com.example.a1stapp.Models.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,7 +34,6 @@ public class MessageActivity extends AppCompatActivity {
     private ImageButton btn_send;
     private EditText text_send;
     Chat chat;
-    boolean bool;
     private MessageAdapter messageAdapter;
     private List<Chat> mChat;
     private RecyclerView recyclerView;
@@ -45,10 +42,8 @@ public class MessageActivity extends AppCompatActivity {
     private Intent intent;
     private String userId;
     private DatabaseReference reference;
-    ValueEventListener seenListener;
     boolean notify = false, readR;
     User user;
-    APIService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +57,10 @@ public class MessageActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // and this
                 startActivity(new Intent(MessageActivity.this, ChatActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
 
-        //apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -94,7 +87,6 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        Log.d("xxxx", " " + userId);
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -105,7 +97,6 @@ public class MessageActivity extends AppCompatActivity {
                 if (user.getImageURL().equals("default")) {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
-                    //and this
                     Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
                 }
                 readMessages(fuser.getUid(), userId, user.getImageURL());
@@ -118,12 +109,11 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void seenMessage(final String userid){
-        reference = FirebaseDatabase.getInstance().getReference().child("chats"); //"chats"
-        seenListener = reference.addValueEventListener(new ValueEventListener() {
+         reference = FirebaseDatabase.getInstance().getReference().child("chats"); //"chats"
+         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    //boolean booly = snapshot.child("users").child(userid).child("readReceipts").getValue(boolean.class);
                     chat = snapshot.getValue(Chat.class);
                     if (chat.getReceiver().equals(fuser.getUid()) && chat.getSender().equals(userid)){
                         HashMap<String, Object> hashMap = new HashMap<>();
@@ -150,59 +140,7 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("message", message);
         hashMap.put("isSeen", false);
         reference.child("chats").push().setValue(hashMap);
-//        final String msg = message;
-//        reference = FirebaseDatabase.getInstance().getReference().child("users").child(fuser.getUid());
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                User user = dataSnapshot.getValue(User.class);
-//                if (notify) {
-//                    sendNotifiaction(receiver, user.getFirstName() + " " + user.getLastName(), msg);
-//                }
-//                notify = false;
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//            }
-//        });
     }
-
-//    private void sendNotifiaction(String receiver, final String username, final String message) {
-//        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
-//        Query query = tokens.orderByKey().equalTo(receiver);
-//        query.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    Token token = snapshot.getValue(Token.class);
-//                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username + ": " + message, "New Message",
-//                            userId);
-//                    Sender sender = new Sender(data, token.getToken());
-//                    apiService.sendNotification(sender)
-//                            .enqueue(new Callback<MyResponse>() {
-//                                @Override
-//                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-//                                    if (response.code() == 200) {
-//                                        if (response.body().success != 1) {
-//                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-//                                        }
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onFailure(Call<MyResponse> call, Throwable t) {
-//
-//                                }
-//                            });
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
 
     private void readMessages(final String myid, final String userKey, final String imageurl) {
         mChat = new ArrayList<>();
@@ -237,8 +175,7 @@ public class MessageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         status(true);
-    }
-
+        }
     @Override
     protected void onPause() {
         super.onPause();

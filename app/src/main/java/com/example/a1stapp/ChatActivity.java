@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.widget.Toolbar;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.a1stapp.Fragments.ChatsFragment;
@@ -26,15 +27,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
 
-
     private CircleImageView profile_image;
     private TextView username;
     private Toolbar toolbar;
+    User user;
     private FirebaseUser firebaseUser;
     private DatabaseReference reference;
     @Override
@@ -47,15 +47,13 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("");
         profile_image = findViewById(R.id.profile_image);
         username = findViewById(R.id.username);
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+                user = dataSnapshot.getValue(User.class);
                 username.setText(user.getFirstName() + " " + user.getLastName());
-
                 if(user.getImageURL().equals("default"))
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 else
@@ -69,7 +67,6 @@ public class ChatActivity extends AppCompatActivity {
 
         final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
-
         reference = FirebaseDatabase.getInstance().getReference("chats");
         reference.addValueEventListener(new ValueEventListener() {
             @Override

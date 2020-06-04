@@ -10,11 +10,8 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
-import android.widget.ImageView;
-
 import com.example.a1stapp.R;
 import com.yahoo.mobile.client.android.util.PixelUtil;
-
 import java.math.BigDecimal;
 
 /**

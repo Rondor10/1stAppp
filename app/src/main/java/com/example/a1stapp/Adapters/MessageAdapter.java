@@ -7,10 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.a1stapp.Models.Chat;
 import com.example.a1stapp.R;
@@ -20,7 +18,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -66,7 +63,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 boolean thisB = dataSnapshot.child(thisID).child("readReceipts").getValue(boolean.class);
                 boolean guestB = dataSnapshot.child(guestID).child("readReceipts").getValue(boolean.class);
                 if(position == (mChat.size() - 1)) {
-                    Log.d("xxxxxxx", "this: " + thisB + ", guest: " + guestB);
                     if(chat.getIsSeen() && thisB && guestB) {
                         holder.text_seen.setText("Seen");
                     } else {
@@ -98,14 +94,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             show_message = itemView.findViewById(R.id.show_message);
             profile_image = itemView.findViewById(R.id.profile_image);
             text_seen = itemView.findViewById(R.id.text_seen);
-
         }
     }
 
     @Override
     public int getItemViewType(int position) {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-
         if(mChat.get(position).getSender().equals(fuser.getUid()))
             return MSG_TYPE_RIGHT;
         else

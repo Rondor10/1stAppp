@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.example.a1stapp.Models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
@@ -112,7 +111,6 @@ public class ConstantSettings extends AppCompatActivity {
     private void updateLabel() {
         String myFormat = "MM/dd/yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        // edittext.setText(sdf.format(myCalendar.getTime()));
         userDOBView.setText(sdf.format(myCalendar.getTime()));
     }
 

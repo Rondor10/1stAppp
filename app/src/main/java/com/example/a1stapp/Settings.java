@@ -4,14 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,7 +18,6 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.a1stapp.Models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -30,7 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,9 +37,9 @@ public class Settings extends AppCompatActivity {
     private String firstName = "", lastName = "", wantedGender = "";
     private RangeSeekBar SeekBarRange;
     private Button btn_save;
-    private TextView txt, textview, titleMsg, min;
+    private TextView txt, titleMsg, min;
     private RadioGroup radioGroup_wantedGender;
-    private ImageButton facebook_btn, instagram_btn, goToChat_btn;
+    private ImageButton goToChat_btn;
     private SeekBar seekBar;
     private User host = new User();
     @Override
@@ -110,7 +105,6 @@ public class Settings extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         int cntUsers = dataSnapshot.child("usersCNT").getValue(int.class);
-                        textview.setText("Welcome to our community of " + cntUsers + " people!");
                         User temp = dataSnapshot.child("users").child(host.getKey()).getValue(User.class);
                         if (temp != null && temp.getKey().equals(host.getKey())) {
                             host = dataSnapshot.child("users").child(host.getKey()).getValue(User.class);
@@ -209,8 +203,6 @@ public class Settings extends AppCompatActivity {
 
     private void findViews() {
 
-        facebook_btn = findViewById(R.id.facebook_btn);
-        instagram_btn = findViewById(R.id.instagram_btn);
         titleMsg = findViewById(R.id.titleMsg);
         seekBar = findViewById(R.id.seekBar);
         mSpinner = findViewById(R.id.mSpinner);
@@ -218,52 +210,11 @@ public class Settings extends AppCompatActivity {
         SeekBarRange= findViewById(R.id.SeekBarRange);
         btn_save = findViewById(R.id.btn_save);
         txt = findViewById(R.id.txt);
-        textview = findViewById(R.id.textview);
         radioGroup_wantedGender = findViewById(R.id.radioGroup_wantedGender);
         goToChat_btn = findViewById(R.id.goToChat_btn);
     }
 
     private void initViews() {
-        ///Open Facebook
-        facebook_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String pageId = "";
-                String pageUrl = "https://www.facebook.com/" + pageId;
-                try {
-                    ApplicationInfo applicationInfo = getPackageManager().getApplicationInfo("com.facebook.katana", 0);
-                    if (applicationInfo.enabled) {
-                        int versionCode = getPackageManager().getPackageInfo("com.facebook.katana", 0).versionCode;
-                        String url;
-                        if (versionCode >= 3002850) {
-                            url = "fb://facewebmodal/f?href=" + pageUrl;
-                        } else {
-                            url = "fb://page/" + pageId;
-                        }
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                    } else {
-                        throw new Exception("Facebook is disabled");
-                    }
-                } catch (Exception e) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(pageUrl)));
-                }
-            }
-        });
-        ///Open Instagram
-        instagram_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri uri = Uri.parse("http://instagram.com/_u/ron_dor10");
-                Intent likeIng = new Intent(Intent.ACTION_VIEW, uri);
-                likeIng.setPackage("com.instagram.android");
-                try {
-                    startActivity(likeIng);
-                } catch (ActivityNotFoundException e) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://instagram.com/_u/ron_dor10")));
-                }
-            }
-        });
 
         ///////Range Seek Bar
         SeekBarRange.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
@@ -327,7 +278,6 @@ public class Settings extends AppCompatActivity {
         super.onResume();
         status(true);
     }
-
     @Override
     protected void onPause() {
         super.onPause();

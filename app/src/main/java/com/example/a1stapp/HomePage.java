@@ -22,7 +22,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -70,8 +69,8 @@ public class HomePage extends AppCompatActivity {
     public void createMarkers() {
         mMap.clear();
         mMap.setInfoWindowAdapter(new MyMarkerAdapter(HomePage.this));
-        //marker_currentUser = new LatLng(host.getLatitude(), host.getLongitude());
-        marker_currentUser = new LatLng(32.070810, 34.812880); //GIVATAYIM, IL - FOR EXAMPLE
+//        marker_currentUser = new LatLng(host.getLatitude(), host.getLongitude());
+        marker_currentUser = new LatLng(32.069015, 34.812609); /// ort latitude = 32.069015, ort longitude = 34.812609.
 
         List<String> currentUser_hobbies = new LinkedList<>();
         for (Map.Entry<String, Boolean> entry : host.getCategories().entrySet()) {
@@ -80,7 +79,7 @@ public class HomePage extends AppCompatActivity {
             }
         }
         if (marker_currentUser.latitude == 0 && marker_currentUser.longitude == 0) {
-            mMap.addMarker((new MarkerOptions().position(new LatLng(0, 0)).title("YOUR PHONE NUMBER: " + host.getTel()).snippet("YOUR CHOSEN DISTANCE: " + host.getDistance() + " km." + "\n" + "YOUR HOBBIES: " + currentUser_hobbies.toString() + "\n").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
+            mMap.addMarker((new MarkerOptions().position(new LatLng(0, 0)).title("Your Name: " + host.getFullName()).snippet("Your Phone Number: " + host.getTel() + "\n" + "Your Chosen Distance: " + host.getDistance() + " km." + "\n" + "Your Hobbies: " + currentUser_hobbies.toString()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
         } else {
             mMap.addMarker((new MarkerOptions().position(marker_currentUser).title("identity check").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
         }
@@ -101,7 +100,6 @@ public class HomePage extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    //dataSnapshot.getChildrenCount();
                     guest = ds.getValue(User.class);
                     if (!guest.getKey().equals(host.getKey())) {
                         Location loc_NewUser = new Location(LocationManager.GPS_PROVIDER);
@@ -111,7 +109,6 @@ public class HomePage extends AppCompatActivity {
                         distance_2users *= 10;
                         distance_2users = (double) Math.round(distance_2users);
                         distance_2users /= 10;
-                        Log.d("OFER", "Phone number: " + guest.getTel() + ", max distance: " + guest.getDistance() + ", actual distance: " + distance_2users + ", categories: " + guest.getCategories());
                         sharedHobbies.clear();
                         sharedHobbies = findingSharedHobbies(guest);
                         String hostBirthday = host.getBirthday();
@@ -154,7 +151,6 @@ public class HomePage extends AppCompatActivity {
                         boolean flag3 = (host.getGenderWanted().equals(guest.getGender()) && (host.getGender().equals(guest.getGenderWanted()) || guest.getGenderWanted().equals("Flexible"))); //נק' הנחה: אני רוצה את מגדר הלקוח, והוא רוצה את מגדרי(ספציפית או שהוא גמיש)
                         boolean flag4 = (host.getGenderWanted().equals("Flexible") && (host.getGender().equals(guest.getGenderWanted()) || guest.getGenderWanted().equals("Flexible"))); //נק' הנחה: אני גמיש מגדרית, והוא רוצה את מגדרי(ספציפית או שהוא גמיש גם)
                         boolean flag5 = ((host.getMinAge() <= guestAge && host.getMaxAge() >= guestAge) && (guest.getMinAge() <= hostAge && guest.getMaxAge() >= hostAge)); //נק' הנחה: אני בטווח הגילאים שלו, והוא בטווח הגילאים שלי
-                        Log.d("OFER", host.getGenderWanted() + " " + guest.getGender());
                         if (flag1 && flag2 && (flag3 || flag4) && flag5) {
                             cnt[0] = cnt[0] + 1;
                             hobbies = sharedHobbies.toString();

@@ -47,25 +47,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-          final User user = mUsers.get(position);
-          holder.username.setText(user.getFirstName() + " " + user.getLastName());
+        final User user = mUsers.get(position);
+        holder.username.setText(user.getFirstName() + " " + user.getLastName());
 
-          if(user.getImageURL().equals("default"))
-              holder.profile_image.setImageResource(R.mipmap.ic_launcher);
-          else
-              Glide.with(mContext).load(user.getImageURL()).into(holder.profile_image);
-          if(isChat) {
-              if(user.isOnline() == true && isShowOnline) {
-                  holder.img_on.setVisibility(View.VISIBLE);
-                  holder.img_off.setVisibility(View.GONE);
-              } else {
-                  holder.img_on.setVisibility(View.GONE);
-                  holder.img_off.setVisibility(View.VISIBLE);
-              }
-          } else {
-              holder.img_on.setVisibility(View.GONE);
-              holder.img_off.setVisibility(View.GONE);
-          }
+        if(user.getImageURL().equals("default"))
+            holder.profile_image.setImageResource(R.mipmap.ic_launcher);
+        else
+            Glide.with(mContext).load(user.getImageURL()).into(holder.profile_image);
+        if(isChat) {
+            if(user.isOnline() == true && user.isShowOnline() && isShowOnline) {
+                holder.img_on.setVisibility(View.VISIBLE);
+                holder.img_off.setVisibility(View.GONE);
+            } else {
+                holder.img_on.setVisibility(View.GONE);
+                holder.img_off.setVisibility(View.VISIBLE);
+            }
+        } else {
+            holder.img_on.setVisibility(View.GONE);
+            holder.img_off.setVisibility(View.GONE);
+        }
         lastMessage(user.getKey(), holder.last_msg);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +76,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             }
         });
     }
-
 
     @Override
     public int getItemCount() {
@@ -106,7 +105,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("chats");
 
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -132,7 +131,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
